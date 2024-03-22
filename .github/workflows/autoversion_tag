@@ -3,18 +3,11 @@ name: Auto Tag on Commit
 on:
   push:
     branches:
-      - QA  # Adjust this to the branch you want to tag
+      - main  # Adjust this to the branch you want to tag
 
 jobs:
   auto-tag:
     runs-on: ubuntu-latest
-    steps:
-    - name: Assign user
-    env:
-    PR_NUMBER: ${{ github.event.pull_request.number }}
-    run: |
-    curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -X POST -d '{"assignees": ["oldskool"]}' 
-  https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/assignees
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
