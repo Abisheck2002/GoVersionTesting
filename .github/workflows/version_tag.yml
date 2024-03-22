@@ -19,16 +19,22 @@ jobs:
           git config user.email "abisheck.g@netxd.com"
 
       - name: Get the latest tag
+        id: get-latest-tag
+        run: echo ::set-output name=tag::$(git describe --tags --abbrev=0)
+
+      - name: Set tag output
+        id: set_tag
         run: echo "TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
 
       - name: Use tag output
-        run: echo "The tag is $TAG"
+        run: echo "The tag is ${{ env.TAG }}"
 
+      
       - name: Bump version
         id: bump_version
         run: |
           # Extract the previous tag
-          previous_tag="${{ env.TAG }}"
+          previous_tag="${{ steps.getPreVersion.outputs.PREV_TAG }}"
           
           # Extract the version number
           version="${previous_tag}"
