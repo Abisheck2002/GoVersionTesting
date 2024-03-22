@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Set up Git
         run: |
@@ -22,25 +22,19 @@ jobs:
         id: get-latest-tag
         run: echo ::set-output name=tag::$(git describe --tags --abbrev=0)
 
-      - name: Get previous tag old
-        id: getPreVersion
+      - name: Get previous tag
+        id: get-previous-tag
         run: |
           git fetch --prune --unshallow
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1)
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
           echo "Previous tag: $PREV_TAG"
+          echo "::set-output name=PREV_TAG::$PREV_TAG"
 
-      - name: Get previous tag
-        id: get_previous_tag
-        run: |
-          previous_tag=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))
-          echo "Previous version in new : $previous_tag"
-
-      
       - name: Bump version
         id: bump_version
         run: |
           # Extract the previous tag
-          previous_tag="${{ steps.getPreVersion.outputs.PREV_TAG }}"
+          previous_tag="${{ steps.get-previous-tag.outputs.PREV_TAG }}"
           
           # Extract the version number
           version="${previous_tag}"
@@ -53,11 +47,8 @@ jobs:
           new_version="${major}.${minor}.${patch}"
           
           echo "New Version = $new_version"
+          echo "::set-output name=new_version::$new_version"
 
       - name: Tag and push changes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          new_tag="v${{ steps.bump_version.outputs.new_version }}"
-          git tag "$new_tag"
-          git push origin "$new_tag"
+          GITHUB_TOKEN: ${{ secrets
