@@ -1,1 +1,3 @@
 # GoVersionTesting
+
+QA_VERSION
